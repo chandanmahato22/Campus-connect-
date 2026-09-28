@@ -1,6 +1,7 @@
 package in.chandan.CampusConnect.controller;
 
 import in.chandan.CampusConnect.dto.ClubReqDto;
+import in.chandan.CampusConnect.dto.ClubRespDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.service.ClubService;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -27,8 +29,8 @@ public class ClubController {
     }
 
     @GetMapping("/clubs")
-    public ResponseEntity<Set<Club>> getClubs(){
-        Set<Club> clubs = clubService.getClubs();
+    public ResponseEntity<List<ClubRespDto>> getClubs(){
+        List<ClubRespDto> clubs = clubService.getClubs();
         return ResponseEntity.ok(clubs);
     }
 

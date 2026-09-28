@@ -1,11 +1,13 @@
 package in.chandan.CampusConnect.service;
 
 import in.chandan.CampusConnect.dto.UserRegistrationDto;
+import in.chandan.CampusConnect.dto.UserRespDto;
 import in.chandan.CampusConnect.dto.UserResponseDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Users;
 import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.apache.catalina.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class UserService {
         this.clubRepository = clubRepository;
     }
 
-
+    @Transactional
     public UserResponseDto registerUser(UserRegistrationDto userReq){
         System.out.println("ENTERED auth service ");
         Users user = new Users();
@@ -45,5 +47,19 @@ public class UserService {
         UserResponseDto respDto = new UserResponseDto();
         respDto.setName(resp.getName());
         return respDto;
+    }
+
+    public UserRespDto getUser(Long id){
+        Users user = userRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("user not found")
+        );
+
+        UserRespDto resp = new UserRespDto();
+
+        resp.setBranch(user.getBranch());
+        resp.setName(user.getName());
+        resp.setUid(user.getUid());
+
+        return resp;
     }
 }
