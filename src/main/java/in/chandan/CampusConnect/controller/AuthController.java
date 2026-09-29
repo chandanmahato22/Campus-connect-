@@ -28,10 +28,16 @@ public class AuthController {
         return ResponseEntity.ok(resp);
 
     }
-//    //login
-//    @PostMapping("/login")
-//    public ResponseEntity<String> loginUser(@RequestBody UserLoginDto){
-//
-//    }
+    //login
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody UserLoginDto req){
+            if(userService.verifyUser(req)){
+                return ResponseEntity.ok("Login successful");
+            }
+            else {
+                return ResponseEntity.status(401).body("username or password wrong");
+            }
+
+    }
 
 }

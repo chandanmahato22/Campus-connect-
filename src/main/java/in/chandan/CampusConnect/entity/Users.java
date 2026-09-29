@@ -1,10 +1,8 @@
 package in.chandan.CampusConnect.entity;
 
+import in.chandan.CampusConnect.enums.Role;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +28,10 @@ public class Users {
 
     @OneToOne
     @Nullable
-    @JoinColumn(name  = "club_id")
+    @JoinColumn(name = "club_id")
     private Club club;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
 }

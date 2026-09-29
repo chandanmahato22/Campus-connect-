@@ -1,5 +1,6 @@
 package in.chandan.CampusConnect.service;
 
+import in.chandan.CampusConnect.dto.UserLoginDto;
 import in.chandan.CampusConnect.dto.UserRegistrationDto;
 import in.chandan.CampusConnect.dto.UserRespDto;
 import in.chandan.CampusConnect.dto.UserResponseDto;
@@ -9,6 +10,11 @@ import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.apache.catalina.User;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +23,18 @@ import java.time.LocalDateTime;
 @Service
 public class UserService {
 
+
+    private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private ClubRepository clubRepository;
 
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,ClubRepository clubRepository){
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,
+                       ClubRepository clubRepository,AuthenticationManager authenticationManager){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.clubRepository = clubRepository;
+        this.authenticationManager = authenticationManager;
     }
 
     @Transactional
@@ -61,5 +71,11 @@ public class UserService {
         resp.setUid(user.getUid());
 
         return resp;
+    }
+
+    public boolean verifyUser(UserLoginDto req){
+        Authentication authentication = authenticationManager.
+                authenticate(new UsernamePasswordAuthenticationToken(req.getUid(),req.getPassword()));
+        return authentication.isAuthenticated();
     }
 }
