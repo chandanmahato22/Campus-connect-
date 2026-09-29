@@ -8,6 +8,7 @@ import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Users;
 import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
 import org.apache.catalina.User;
 
@@ -23,6 +24,8 @@ import java.time.LocalDateTime;
 @Service
 public class UserService {
 
+    @Autowired
+    private JwtService jwtService;
 
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
@@ -73,9 +76,41 @@ public class UserService {
         return resp;
     }
 
-    public boolean verifyUser(UserLoginDto req){
-        Authentication authentication = authenticationManager.
-                authenticate(new UsernamePasswordAuthenticationToken(req.getUid(),req.getPassword()));
-        return authentication.isAuthenticated();
+//    public String verifyUser(UserLoginDto req){
+//        Authentication authentication = authenticationManager.
+//                authenticate(new UsernamePasswordAuthenticationToken(req.getUid(),req.getPassword()));
+//                if(authentication.isAuthenticated()){
+//                return jwtService.generateToken(req);
+//        }
+//        else return "failed to acquire a token";
+//    }
+
+    public String verifyUser(UserLoginDto req) {
+
+        System.out.println("UID: " + req.getUid());
+        System.out.println("Password received: " + req.getPassword());
+
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                req.getUid(),
+                                req.getPassword()
+                        )
+                );
+
+        System.out.println("Authentication: " + authentication.isAuthenticated());
+
+        if (authentication.isAuthenticated()) {
+
+            System.out.println("Generating JWT...");
+
+            String token = jwtService.generateToken(req);
+
+            System.out.println("TOKEN: " + token);
+
+            return token;
+        }
+
+        return "failed to acquire a token";
     }
 }
