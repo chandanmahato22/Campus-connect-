@@ -1,12 +1,11 @@
 package in.chandan.CampusConnect.service;
 
-import ch.qos.logback.core.boolex.EventEvaluatorBase;
-import in.chandan.CampusConnect.controller.RegistrationController;
 import in.chandan.CampusConnect.dto.RegistrationReqDto;
 import in.chandan.CampusConnect.entity.Event;
 import in.chandan.CampusConnect.entity.Registration;
 import in.chandan.CampusConnect.repository.EventRepository;
 import in.chandan.CampusConnect.repository.RegistrationRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,5 +29,13 @@ public class RegistrationService {
         reg.setUid(reg.getUid());
         registrationRepository.save(reg);
         return "Registeration completed for event" + reg.getEvent().getName();
+    }
+
+    public void deleteRegistration(Authentication authentication) {
+        long uid = Long.parseLong(authentication.getName());
+        Registration registration = registrationRepository.findByUid(uid).orElseThrow(
+                () -> new RuntimeException("registration not found")
+        );
+        registrationRepository.delete(registration);
     }
 }

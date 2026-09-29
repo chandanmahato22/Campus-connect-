@@ -1,5 +1,6 @@
 package in.chandan.CampusConnect.service;
 
+import in.chandan.CampusConnect.dto.ClubRespDto;
 import in.chandan.CampusConnect.dto.EventDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Event;
@@ -35,5 +36,12 @@ public class EventService {
     }
     public List<Event> getEvents(){
         return eventRepository.findAll();
+    }
+
+
+    public Event getEvent(long id) {
+        return  eventRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("event not found")
+        );
     }
 }

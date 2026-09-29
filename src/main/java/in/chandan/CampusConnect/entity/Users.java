@@ -26,11 +26,6 @@ public class Users {
 
     private String branch;
 
-    @OneToOne
-    @Nullable
-    @JoinColumn(name = "club_id")
-    private Club club;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 

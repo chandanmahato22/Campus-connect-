@@ -21,5 +21,6 @@ public class UserRegistrationDto {
 
     private String branch;
 
-    private String club_name;
+    private String role;
+
 }

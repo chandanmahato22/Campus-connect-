@@ -7,13 +7,14 @@ import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.service.ClubService;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/clubs")
 public class ClubController {
 
     private ClubService clubService;
@@ -21,17 +22,46 @@ public class ClubController {
     public ClubController(ClubService clubService){
         this.clubService = clubService;
     }
-    @PostMapping("/createClub")
+
+    //creating club
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
     public ResponseEntity<String> createClub(@RequestBody ClubReqDto clubReq){
 
         String msg = clubService.createClub(clubReq);
         return ResponseEntity.ok(msg);
     }
 
-    @GetMapping("/clubs")
+    //printing all clubs
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
     public ResponseEntity<List<ClubRespDto>> getClubs(){
         List<ClubRespDto> clubs = clubService.getClubs();
         return ResponseEntity.ok(clubs);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<ClubRespDto> getClub(@PathVariable long id){
+        ClubRespDto resp = clubService.getCLub(id);
+        return ResponseEntity.ok(resp);
+    }
+
+    //deleting a club
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteClub(@PathVariable long id){
+        clubService.deleteClub(id);
+        return ResponseEntity.ok("club deleted successfully");
+    }
+
+    //update
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<ClubRespDto>  updateClub(@PathVariable long id,
+                          @RequestBody ClubReqDto req){
+        ClubRespDto resp = clubService.updateClub(id,req);
+        return ResponseEntity.ok(resp);
     }
 
 }

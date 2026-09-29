@@ -6,6 +6,7 @@ import in.chandan.CampusConnect.dto.UserRespDto;
 import in.chandan.CampusConnect.dto.UserResponseDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Users;
+import in.chandan.CampusConnect.enums.Role;
 import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
@@ -51,9 +52,11 @@ public class UserService {
         String hassPass = passwordEncoder.encode(rawPass);
         user.setPassword(hassPass);
         user.setBranch(userReq.getBranch());
+        user.setRole(Role.valueOf(userReq.getRole()));
 
-        Club club = clubRepository.findByName(userReq.getClub_name()).orElse(null);
-        user.setClub(club);
+//        Club club = clubRepository.findByName(userReq.getClub_name()).orElse(null);
+//        user.setClub(club);
+
         user.setCreatedAt(LocalDateTime.now());
         Users resp = userRepository.save(user);
 

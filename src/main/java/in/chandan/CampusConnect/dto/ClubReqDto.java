@@ -12,5 +12,5 @@ public class ClubReqDto {
 
     private String genre;
 
-    private int user_id;
+    private Long user_id;
 }

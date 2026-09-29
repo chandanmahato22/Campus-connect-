@@ -4,22 +4,18 @@ package in.chandan.CampusConnect.controller;
 import in.chandan.CampusConnect.dto.RegistrationReqDto;
 import in.chandan.CampusConnect.repository.RegistrationRepository;
 import in.chandan.CampusConnect.service.RegistrationService;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 public class RegistrationController {
 
     RegistrationService registrationService;
-    RegistrationRepository registrationRepository;
 
     public RegistrationController(RegistrationService registrationService, RegistrationRepository registrationRepository){
         this.registrationService = registrationService;
-        this.registrationRepository = registrationRepository;
     }
 
     @PostMapping("/registerEvent")
@@ -29,5 +25,12 @@ public class RegistrationController {
 
         return ResponseEntity.ok(msg);
     }
+
+    @DeleteMapping("/cancelRegistration")
+    public ResponseEntity<String> cancelRegistration(Authentication authentication){
+        registrationService.deleteRegistration(authentication);
+        return ResponseEntity.ok("registration cancelled");
+    }
+
 
 }
