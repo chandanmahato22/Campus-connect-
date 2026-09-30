@@ -2,6 +2,7 @@ package in.chandan.CampusConnect.service;
 
 import in.chandan.CampusConnect.entity.PrincipalUser;
 import in.chandan.CampusConnect.entity.Users;
+import in.chandan.CampusConnect.exceptions.ResourceNotFoundException;
 import in.chandan.CampusConnect.repository.UserRepository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +26,7 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Users user = userRepository.findById(Long.parseLong(username)).orElseThrow(()
-        -> new RuntimeException("User not found"));
+        -> new ResourceNotFoundException("User not found with uid :" + username));
 
         return new PrincipalUser(user);
     }

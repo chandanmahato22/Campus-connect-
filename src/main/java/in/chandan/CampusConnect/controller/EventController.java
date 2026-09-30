@@ -5,6 +5,7 @@ import in.chandan.CampusConnect.dto.EventDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Event;
 import in.chandan.CampusConnect.service.EventService;
+import jakarta.validation.Valid;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,8 +25,8 @@ public class EventController {
 
     //create a new event
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> createEvent(@RequestBody EventDto eventReq){
+    @PreAuthorize("hasRole('ADMIN','ORGANIZER')")
+    public ResponseEntity<String> createEvent(@Valid  @RequestBody EventDto eventReq){
         System.out.println("entered evnetController");
         String msg = eventService.createEvent(eventReq);
         return ResponseEntity.ok(msg);
@@ -41,7 +42,7 @@ public class EventController {
     //get particulat event
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getClub(@PathVariable long id){
+    public ResponseEntity<Event> getClub(@Valid @PathVariable long id){
         Event resp = eventService.getEvent(id);
         return ResponseEntity.ok(resp);
     }

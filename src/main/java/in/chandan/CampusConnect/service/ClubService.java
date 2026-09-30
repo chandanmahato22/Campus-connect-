@@ -7,6 +7,8 @@ import in.chandan.CampusConnect.dto.ClubRespDto;
 import in.chandan.CampusConnect.dto.UserRespDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Users;
+import in.chandan.CampusConnect.exceptions.ResourceAlreadyExistException;
+import in.chandan.CampusConnect.exceptions.ResourceNotFoundException;
 import in.chandan.CampusConnect.mappers.ClubDto;
 import in.chandan.CampusConnect.mappers.UserDto;
 import in.chandan.CampusConnect.repository.ClubRepository;
@@ -33,16 +35,19 @@ public class ClubService {
     public String createClub(ClubReqDto clubReq){
        Club club = new Club();
 
-       club.setName(clubReq.getName());
-       club.setGenre(clubReq.getGenre());
+      Club test = clubRepository.findByName(clubReq.getName()).orElse(null);
+      if(test != null) {
+          throw new ResourceAlreadyExistException("club with name :" + clubReq.getName() + " already exists ");
+      }
 
        Users user = userRepository.findById((long)clubReq.getUser_id()).orElseThrow(
-               () -> new RuntimeException("User not found")
+               () -> new ResourceNotFoundException("User not found with uid : " + clubReq.getUser_id())
        );
 
-       club.setUser(user);
-       Club clubRep = clubRepository.save(club);
-//       user.setClub(clubRep);
+        club.setName(clubReq.getName());
+        club.setGenre(clubReq.getGenre());
+        club.setUser(user);
+        clubRepository.save(club);
        return "Club has been created wth name " + club.getName();
     }
 
@@ -54,7 +59,7 @@ public class ClubService {
 
     public ClubRespDto getCLub(long id) {
         Club clubResp = clubRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Club not found"));
+                () -> new ResourceNotFoundException("club with club id : " + id + "not found"));
 
         ClubRespDto resp = new ClubRespDto();
         resp.setGenre(clubResp.getGenre());
@@ -66,7 +71,7 @@ public class ClubService {
 
     public void deleteClub(long id) {
         Club clubResp = clubRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Club not found"));
+                () -> new ResourceNotFoundException("club with id :  " + id + "not found"));
 
         clubRepository.delete(clubResp);
     }
@@ -74,13 +79,18 @@ public class ClubService {
     @Transactional
     public ClubRespDto updateClub(long id,ClubReqDto req) {
         Club clubResp = clubRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Club not found"));
+                () -> new ResourceNotFoundException("club with id :  " + id + "not found"));
+
+        Club test = clubRepository.findByName(req.getName()).orElse(null);
+        if(test != null) {
+            throw new ResourceAlreadyExistException("club with name :" + req.getName() + " already exists ");
+        }
 
         clubResp.setName(req.getName());
         clubResp.setGenre(clubResp.getGenre());
 
         Users user = userRepository.findById(req.getUser_id()).orElseThrow(
-                () -> new RuntimeException("Club not found"));
+                () -> new ResourceNotFoundException("User not found with uid : " + req.getUser_id()));
 
         clubResp.setUser(user);
 

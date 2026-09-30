@@ -4,6 +4,7 @@ package in.chandan.CampusConnect.controller;
 import in.chandan.CampusConnect.dto.RegistrationReqDto;
 import in.chandan.CampusConnect.repository.RegistrationRepository;
 import in.chandan.CampusConnect.service.RegistrationService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +20,10 @@ public class RegistrationController {
     }
 
     @PostMapping("/registerEvent")
-    public ResponseEntity<String> registerForEvent(@RequestBody RegistrationReqDto regReq){
+    public ResponseEntity<String> registerForEvent(@Valid  @RequestBody RegistrationReqDto regReq,
+                                                   Authentication authentication){
 
-        String msg = registrationService.register(regReq);
+        String msg = registrationService.register(regReq,authentication);
 
         return ResponseEntity.ok(msg);
     }

@@ -7,6 +7,7 @@ import in.chandan.CampusConnect.dto.UserResponseDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Users;
 import in.chandan.CampusConnect.enums.Role;
+import in.chandan.CampusConnect.exceptions.ResourceNotFoundException;
 import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
@@ -43,21 +44,20 @@ public class UserService {
 
     @Transactional
     public UserResponseDto registerUser(UserRegistrationDto userReq){
-        System.out.println("ENTERED auth service ");
+
         Users user = new Users();
 
         user.setUid(userReq.getUid());
         user.setName(userReq.getName());
+
         String rawPass = userReq.getPassword();
         String hassPass = passwordEncoder.encode(rawPass);
+
         user.setPassword(hassPass);
         user.setBranch(userReq.getBranch());
         user.setRole(Role.valueOf(userReq.getRole()));
-
-//        Club club = clubRepository.findByName(userReq.getClub_name()).orElse(null);
-//        user.setClub(club);
-
         user.setCreatedAt(LocalDateTime.now());
+
         Users resp = userRepository.save(user);
 
         UserResponseDto respDto = new UserResponseDto();
@@ -67,7 +67,7 @@ public class UserService {
 
     public UserRespDto getUser(Long id){
         Users user = userRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("user not found")
+                () -> new ResourceNotFoundException("user not found with uid : " + id)
         );
 
         UserRespDto resp = new UserRespDto();
@@ -79,19 +79,7 @@ public class UserService {
         return resp;
     }
 
-//    public String verifyUser(UserLoginDto req){
-//        Authentication authentication = authenticationManager.
-//                authenticate(new UsernamePasswordAuthenticationToken(req.getUid(),req.getPassword()));
-//                if(authentication.isAuthenticated()){
-//                return jwtService.generateToken(req);
-//        }
-//        else return "failed to acquire a token";
-//    }
-
     public String verifyUser(UserLoginDto req) {
-
-        System.out.println("UID: " + req.getUid());
-        System.out.println("Password received: " + req.getPassword());
 
         Authentication authentication =
                 authenticationManager.authenticate(
@@ -101,17 +89,8 @@ public class UserService {
                         )
                 );
 
-        System.out.println("Authentication: " + authentication.isAuthenticated());
-
         if (authentication.isAuthenticated()) {
-
-            System.out.println("Generating JWT...");
-
-            String token = jwtService.generateToken(req);
-
-            System.out.println("TOKEN: " + token);
-
-            return token;
+            return jwtService.generateToken(req);
         }
 
         return "failed to acquire a token";

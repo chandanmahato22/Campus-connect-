@@ -5,6 +5,7 @@ import in.chandan.CampusConnect.dto.ClubRespDto;
 import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.service.ClubService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +27,7 @@ public class ClubController {
     //creating club
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<String> createClub(@RequestBody ClubReqDto clubReq){
+    public ResponseEntity<String> createClub( @Valid  @RequestBody ClubReqDto clubReq){
 
         String msg = clubService.createClub(clubReq);
         return ResponseEntity.ok(msg);
@@ -42,7 +43,7 @@ public class ClubController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<ClubRespDto> getClub(@PathVariable long id){
+    public ResponseEntity<ClubRespDto> getClub(@Valid @PathVariable long id){
         ClubRespDto resp = clubService.getCLub(id);
         return ResponseEntity.ok(resp);
     }
@@ -50,7 +51,7 @@ public class ClubController {
     //deleting a club
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteClub(@PathVariable long id){
+    public ResponseEntity<String> deleteClub(@Valid @PathVariable long id){
         clubService.deleteClub(id);
         return ResponseEntity.ok("club deleted successfully");
     }
@@ -58,7 +59,7 @@ public class ClubController {
     //update
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<ClubRespDto>  updateClub(@PathVariable long id,
+    public ResponseEntity<ClubRespDto>  updateClub(@Valid @PathVariable long id,
                           @RequestBody ClubReqDto req){
         ClubRespDto resp = clubService.updateClub(id,req);
         return ResponseEntity.ok(resp);

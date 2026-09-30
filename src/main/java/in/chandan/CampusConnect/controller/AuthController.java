@@ -5,6 +5,7 @@ import in.chandan.CampusConnect.dto.UserLoginDto;
 import in.chandan.CampusConnect.dto.UserRegistrationDto;
 import in.chandan.CampusConnect.dto.UserResponseDto;
 import in.chandan.CampusConnect.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class AuthController {
         }
    // register
     @PostMapping("/register")
-   public  ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegistrationDto userReq){
+   public  ResponseEntity<UserResponseDto> registerUser(@Valid @RequestBody UserRegistrationDto userReq){
         System.out.println("ENTERED auth controller ");
         UserResponseDto resp = userService.registerUser(userReq);
 
@@ -30,7 +31,7 @@ public class AuthController {
     }
     //login
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody UserLoginDto req){
+    public ResponseEntity<String> loginUser( @Valid @RequestBody UserLoginDto req){
             System.out.println("🔥 LOGIN CONTROLLER HIT");
             String key = userService.verifyUser(req);
             return ResponseEntity.ok(key);
