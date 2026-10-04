@@ -3,6 +3,7 @@ package in.chandan.CampusConnect.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -73,7 +74,7 @@ public class GlobalExceptionHandler{
                 .body(err);
     }
 
-
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex,
                                                             HttpServletRequest req){
 
@@ -93,4 +94,32 @@ public class GlobalExceptionHandler{
 
         return ResponseEntity.status(400).body(err);
     }
+
+    @ExceptionHandler(TooManyRequestException.class)
+    ResponseEntity<ErrorResponse> tooManyRequestHandler(TooManyRequestException ex,
+                                                            HttpServletRequest req){
+
+        ErrorResponse err = new ErrorResponse();
+        err.setMsg(ex.getMessage());
+        err.setPath(req.getRequestURI());
+        err.setStatus(429);
+        err.setError("TOO MANY REQUEST !");
+        err.setTimeStamp(LocalDateTime.now());
+
+        return ResponseEntity.status(429).body(err);
+    }
+    @ExceptionHandler(AuthenticationException.class)
+    ResponseEntity<ErrorResponse> tooManyRequestHandler(AuthenticationException ex,
+                                                        HttpServletRequest req){
+
+        ErrorResponse err = new ErrorResponse();
+        err.setMsg(ex.getMessage());
+        err.setPath(req.getRequestURI());
+        err.setStatus(401);
+        err.setError("INVALID ID PASSWORD !");
+        err.setTimeStamp(LocalDateTime.now());
+
+        return ResponseEntity.status(401).body(err);
+    }
+
 }

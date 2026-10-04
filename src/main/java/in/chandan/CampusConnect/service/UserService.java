@@ -4,20 +4,17 @@ import in.chandan.CampusConnect.dto.UserLoginDto;
 import in.chandan.CampusConnect.dto.UserRegistrationDto;
 import in.chandan.CampusConnect.dto.UserRespDto;
 import in.chandan.CampusConnect.dto.UserResponseDto;
-import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Users;
 import in.chandan.CampusConnect.enums.Role;
 import in.chandan.CampusConnect.exceptions.ResourceNotFoundException;
-import in.chandan.CampusConnect.repository.ClubRepository;
+import in.chandan.CampusConnect.exceptions.TooManyRequestException;
 import in.chandan.CampusConnect.repository.UserRepository;
-import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.User;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,14 +29,15 @@ public class UserService {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    private ClubRepository clubRepository;
-
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,
-                       ClubRepository clubRepository,AuthenticationManager authenticationManager){
+    private RateLimitService rateLimitService;
+    public UserService(UserRepository userRepository,
+                       RateLimitService rateLimitService,
+                       PasswordEncoder passwordEncoder,
+                       AuthenticationManager authenticationManager){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.clubRepository = clubRepository;
         this.authenticationManager = authenticationManager;
+        this.rateLimitService = rateLimitService;
     }
 
     @Transactional
@@ -79,20 +77,32 @@ public class UserService {
         return resp;
     }
 
-    public String verifyUser(UserLoginDto req) {
+    public String verifyUser(UserLoginDto req,String ip) {
 
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                req.getUid(),
-                                req.getPassword()
-                        )
-                );
+        Long uid = req.getUid();
 
-        if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(req);
+        if(rateLimitService.isBlocked(uid,ip)){
+            throw new TooManyRequestException("Too many failed login attempts." +
+                    "Try again later");
         }
+        try {
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    req.getUid(),
+                                    req.getPassword()
+                            )
+                    );
+            rateLimitService.resetAttempts(uid, ip);
 
-        return "failed to acquire a token";
+            if (authentication.isAuthenticated()) {
+                return jwtService.generateToken(req);
+            }
+        }
+        catch(AuthenticationException ex) {
+            rateLimitService.recordFailedAttempt(uid, ip);
+            throw ex;
+        }
+        return "";
     }
 }

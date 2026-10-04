@@ -7,7 +7,9 @@ import in.chandan.CampusConnect.entity.Event;
 import in.chandan.CampusConnect.exceptions.BadRequestException;
 import in.chandan.CampusConnect.exceptions.ResourceNotFoundException;
 import in.chandan.CampusConnect.repository.EventRepository;
+import in.chandan.CampusConnect.repository.RegistrationRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,8 +19,11 @@ import java.util.List;
 public class EventService {
 
     private EventRepository eventRepository;
-    public EventService(EventRepository eventRepository){
+    private RegistrationRepository registrationRepository;
+    public EventService(EventRepository eventRepository,
+                        RegistrationRepository registrationRepository){
         this.eventRepository = eventRepository;
+        this.registrationRepository = registrationRepository;
     }
 
     @Transactional
@@ -41,14 +46,20 @@ public class EventService {
                 eventResp.getSeats() + " number of seats";
 
     }
+
+
     public List<Event> getEvents(){
         return eventRepository.findAll();
     }
 
-
+    @Cacheable(value = "events", key = "#id")
     public Event getEvent(long id) {
-        return  eventRepository.findById(id).orElseThrow(
+        Event event =   eventRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("event not found with evend id: " + id)
         );
+
+        int number = registrationRepository.countByEvent_id(id);
+         event.setSeats(event.getSeats() - number);
+        return event;
     }
 }

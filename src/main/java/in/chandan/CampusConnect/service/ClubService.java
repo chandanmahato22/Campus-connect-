@@ -14,6 +14,9 @@ import in.chandan.CampusConnect.mappers.UserDto;
 import in.chandan.CampusConnect.repository.ClubRepository;
 import in.chandan.CampusConnect.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,6 +60,7 @@ public class ClubService {
         ).toList();
     }
 
+    @Cacheable(value = "clubs" , key = "#id")
     public ClubRespDto getCLub(long id) {
         Club clubResp = clubRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("club with club id : " + id + "not found"));
@@ -69,6 +73,7 @@ public class ClubService {
 
     }
 
+    @CacheEvict(value = "clubs", key = "#id")
     public void deleteClub(long id) {
         Club clubResp = clubRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("club with id :  " + id + "not found"));
@@ -77,6 +82,7 @@ public class ClubService {
     }
 
     @Transactional
+    @CachePut(value = "clubs", key = "#id")
     public ClubRespDto updateClub(long id,ClubReqDto req) {
         Club clubResp = clubRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("club with id :  " + id + "not found"));

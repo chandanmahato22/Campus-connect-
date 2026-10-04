@@ -6,11 +6,11 @@ import in.chandan.CampusConnect.entity.Club;
 import in.chandan.CampusConnect.entity.Event;
 import in.chandan.CampusConnect.service.EventService;
 import jakarta.validation.Valid;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -18,7 +18,6 @@ import java.util.List;
 public class EventController {
 
     private EventService eventService;
-
     public EventController(EventService eventService){
         this.eventService = eventService;
     }
@@ -27,7 +26,6 @@ public class EventController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN','ORGANIZER')")
     public ResponseEntity<String> createEvent(@Valid  @RequestBody EventDto eventReq){
-        System.out.println("entered evnetController");
         String msg = eventService.createEvent(eventReq);
         return ResponseEntity.ok(msg);
     }
@@ -40,9 +38,8 @@ public class EventController {
     }
 
     //get particulat event
-
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getClub(@Valid @PathVariable long id){
+    public ResponseEntity<Event> getEvent(@Valid @PathVariable long id){
         Event resp = eventService.getEvent(id);
         return ResponseEntity.ok(resp);
     }

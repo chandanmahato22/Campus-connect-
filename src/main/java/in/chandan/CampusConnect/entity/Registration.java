@@ -16,7 +16,7 @@ public class Registration {
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
 

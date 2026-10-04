@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface RegistrationRepository extends JpaRepository<Registration,Long> {
     Optional<Registration> findByUid(long uid);
+    int countByEvent_id(long id);
 }
